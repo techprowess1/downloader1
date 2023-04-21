@@ -1,5 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from flask import Flask, request
+
+app = Flask(__name__)
 
 options = Options()
 options.add_argument("--headless")
@@ -11,6 +14,11 @@ options.add_argument("--disable-dev-shm-usage")
 
 driver = webdriver.Chrome(options=options)
 
-driver.get("https://www.google.com/")
-title = driver.title
-print(title)
+@app.route('/')
+def main():
+    driver.get("https://www.google.com/")
+    title = driver.title
+    print(title)
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0")
