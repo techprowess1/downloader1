@@ -3,6 +3,7 @@ from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 
 
 class Downloader:
@@ -12,29 +13,21 @@ class Downloader:
         self.wait = None
 
     def get_driver(self):
-        chrome_options = webdriver.ChromeOptions()
         prefs = {"profile.default_content_setting_values.notifications": 2}
         
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--disable-gpu-compositing')
-        chrome_options.add_argument('--disable-sync')
-        chrome_options.add_argument('--disable-translate')
-        chrome_options.add_argument('--disable-web-security')
-        chrome_options.add_argument('--disable-web-autofill')
-        chrome_options.add_argument('--disable-web-share')
-        chrome_options.add_argument('--disable-web-updates')
-        chrome_options.add_argument("enable-automation")
-        chrome_options.add_argument("--disable-infobars")
-        chrome_options.add_argument('--disable-sync-autoupdate')
-        chrome_options.add_argument('--disable-sync-autoupdate-service')
-        chrome_options.add_argument('--disable-sync-autoupdate-service-on-startup')
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-infobars")
+        options.add_argument("--disable-dev-shm-usage")
 
-        self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(5)
         self.wait = WebDriverWait(self.driver, 10)
 
-        chrome_options.add_experimental_option("prefs", prefs)
+        options.add_experimental_option("prefs", prefs)
 
     def saveFromNet(self):
         print("saveFromNet")
