@@ -4,7 +4,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
+from flask import Flask, request
 
+app = Flask(__name__)
 
 class Downloader:
     def __init__(self, url):
@@ -144,44 +146,28 @@ class Downloader:
             raise Exception("Error finding download button")
 
 
-# def lambda_handler(event, context):
+@app.route('/download')
+def download():
+    url = request.args.get('url')
+    download_inst = Downloader(url)
+    download_options = [download_inst.saveFromNet]
 
-#     # parsing query string params
-#     # url = event['queryStringParameters']['url']
-#     url = event['url']
-#     # url = "https://www.facebook.com/watch?v=324199376484038"
+    if 'facebook' in url or 'instagram' in url:
+        download_options.append(download_inst.snapSave)
+    elif 'tiktok' in url:
+        download_options.extend([download_inst.saveTikCo, download_inst.tiktokDownloadOnline, download_inst.snapSave])
+    elif 'pinterest' in url:
+        download_options.append(download_inst.pinterestDownloader)
 
-#     download_inst = Downloader(url)
-#     download_options = [download_inst.saveFromNet]
+    for download_option in download_options:
+        try:
+            download_url = download_option()
+            return download_url
+        except Exception as e:
+            print(e)
+            pass
 
-#     if 'facebook' in url or 'instagram' in url:
-#         download_options.append(download_inst.snapSave)
-#     elif 'tiktok' in url:
-#         download_options.extend([download_inst.saveTikCo, download_inst.tiktokDownloadOnline, download_inst.snapSave])
-#     elif 'pinterest' in url:
-#         download_options.append(download_inst.pinterestDownloader)
-#     elif 'twitter' in url:
-#         pass
+    return 'Error: Could not download video'
 
-#     final_choice = random.choice(download_options)
-#     content = final_choice()
-
-#     # construct the body of the response object
-#     dlResponse = {}
-#     dlResponse['content'] = content
-
-#     # Construct http response object
-#     responseObj = {}
-#     responseObj['statusCode'] = 200
-#     responseObj['body'] = json.dumps(dlResponse)
-
-#     # return the response object
-#     return {
-#         'statusCode':200,
-#         'body': responseObj
-    # }
-
-
-url = "https://www.facebook.com/watch?v=324199376484038"
-dl = Downloader(url)
-dl.saveFromNet()
+if __name__ == '__main__':
+    app.run()
