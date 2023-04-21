@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from flask import Flask, request
+import random
 
 app = Flask(__name__)
 
@@ -159,15 +160,16 @@ def download():
     elif 'pinterest' in url:
         download_options.append(download_inst.pinterestDownloader)
 
-    for download_option in download_options:
-        try:
-            download_url = download_option()
-            return download_url
-        except Exception as e:
+    try:
+        selected_fun = random.choice(download_options)
+        download_url = selected_fun()
+        return download_url
+    
+    except Exception as e:
             print(e)
             pass
-
+    
     return 'Error: Could not download video'
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0")
